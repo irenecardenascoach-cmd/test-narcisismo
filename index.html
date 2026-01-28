@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test de Narcisismo - Evaluador Automático</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px 30px;
+        }
+
+        .question-block {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 25px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .question-block:hover {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transform: translateX(5px);
+        }
+
+        .question-number {
+            color: #667eea;
+            font-weight: bold;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .question-text {
+            font-size: 1.2em;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #2d3748;
+            line-height: 1.5;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .option:hover {
+            border-color: #667eea;
+            background: #f7fafc;
+        }
+
+        .option input[type="radio"] {
+            margin-right: 12px;
+            cursor: pointer;
+            width: 20px;
+            height: 20px;
+            accent-color: #667eea;
+        }
+
+        .option label {
+            cursor: pointer;
+            flex: 1;
+            font-size: 1em;
+            color: #4a5568;
+        }
+
+        .option.selected {
+            border-color: #667eea;
+            background: #edf2f7;
+        }
+
+        .submit-container {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 2px solid #e2e8f0;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 18px 50px;
+            font-size: 1.2em;
+            font-weight: bold;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .submit-btn:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .result-container {
+            display: none;
+            background: linear-gradient(135deg, #f6f8fb 0%, #e9ecef 100%);
+            padding: 40px;
+            border-radius: 15px;
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .result-container.show {
+            display: block;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .score {
+            font-size: 4em;
+            font-weight: bold;
+            color: #667eea;
+            margin: 20px 0;
+        }
+
+        .score-label {
+            font-size: 1.2em;
+            color: #4a5568;
+            margin-bottom: 20px;
+        }
+
+        .interpretation {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-top: 30px;
+            text-align: left;
+            border-left: 5px solid #667eea;
+        }
+
+        .interpretation h3 {
+            color: #667eea;
+            font-size: 1.5em;
+            margin-bottom: 15px;
+        }
+
+        .interpretation p {
+            color: #4a5568;
+            line-height: 1.8;
+            margin-bottom: 15px;
+            font-size: 1.05em;
+        }
+
+        .level-badge {
+            display: inline-block;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            margin-top: 10px;
+            font-size: 1.1em;
+        }
+
+        .level-low {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .level-medium {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .level-high {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .progress-indicator {
+            position: sticky;
+            top: 20px;
+            background: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            z-index: 100;
+        }
+
+        .progress-text {
+            color: #4a5568;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .progress-bar-container {
+            background: #e2e8f0;
+            height: 8px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .reset-btn {
+            background: #e2e8f0;
+            color: #4a5568;
+            padding: 12px 30px;
+            font-size: 1em;
+            font-weight: bold;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s;
+        }
+
+        .reset-btn:hover {
+            background: #cbd5e0;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .content {
+                padding: 25px 20px;
+            }
+
+            .question-text {
+                font-size: 1.05em;
+            }
+
+            .score {
+                font-size: 3em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧠 Test de Narcisismo</h1>
+            <p>Evaluador Automático de Patrones de Abuso Narcisista</p>
+        </div>
+
+        <div class="content">
+            <div class="progress-indicator">
+                <div class="progress-text">Progreso: <span id="answeredCount">0</span>/10 preguntas respondidas</div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+            </div>
+
+            <form id="testForm">
+                <!-- Pregunta 1 -->
+                <div class="question-block">
+                    <div class="question-number">Pregunta 1</div>
+                    <div class="question-text">Al inicio, ¿tu pareja te llenaba de mensajes, halagos y atención casi todo el tiempo?</div>
+                    <div class="options">
+                        <div class="option">
+                            <input type="radio" name="q1" value="1" id="q1-1">
+                            <label for="q1-1">Nunca o casi nunca</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q1" value="2" id="q1-2">
+                            <label for="q1-2">Pocas veces</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q1" value="3" id="q1-3">
+                            <label for="q1-3">A veces</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q1" value="4" id="q1-4">
+                            <label for="q1-4">Muchas veces</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q1" value="5" id="q1-5">
+                            <label for="q1-5">Casi siempre / siempre</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pregunta 2 -->
+                <div class="question-block">
+                    <div class="question-number">Pregunta 2</div>
+                    <div class="question-text">¿Alguna vez te hizo dudar de lo que viste, escuchaste o recordabas?</div>
+                    <div class="options">
+                        <div class="option">
+                            <input type="radio" name="q2" value="1" id="q2-1">
+                            <label for="q2-1">Nunca o casi nunca</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q2" value="2" id="q2-2">
+                            <label for="q2-2">Pocas veces</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q2" value="3" id="q2-3">
+                            <label for="q2-3">A veces</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q2" value="4" id="q2-4">
+                            <label for="q2-4">Muchas veces</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q2" value="5" id="q2-5">
+                            <label for="q2-5">Casi siempre / siempre</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pregunta 3 -->
+                <div class="question-block">
+                    <div class="question-number">Pregunta 3</div>
+                    <div class="question-text">Cuando le contabas cómo te sentías, ¿te decía que exagerabas, eras dramática/o o que estabas loca/o?</div>
+                    <div class="options">
+                        <div class="option">
+                            <input type="radio" name="q3" value="1" id="q3-1">
+                            <label for="q3-1">Nunca o casi nunca</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q3" value="2" id="q3-2">
+                            <label for="q3-2">Pocas veces</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q3" value="3" id="q3-3">
+                            <label for="q3-3">A veces</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q3" value="4" id="q3-4">
+                            <label for="q3-4">Muchas veces</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q3" value="5" id="q3-5">
+                            <label for="q3-5">Casi siempre / siempre</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pregunta 4 -->
+                <div class="question-block">
+                    <div class="question-number">Pregunta 4</div>
+                    <div class="question-text">Después de la etapa bonita del inicio, ¿empezó a criticarte o tratarte peor poco a poco?</div>
+                    <div class="options">
+                        <div class="option">
+                            <input type="radio" name="q4" value="1" id="q4-1">
+                            <label for="q4-1">No, se mantuvo igual</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q4" value="2" id="q4-2">
+                            <label for="q4-2">Un poco</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q4" value="3" id="q4-3">
+                            <label for="q4-3">Bastante</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q4" value="4" id="q4-4">
+                            <label for="q4-4">Mucho</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q4" value="5" id="q4-5">
+                            <label for="q4-5">Muchísimo, fue un cambio total</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pregunta 5 -->
+                <div class="question-block">
+                    <div class="question-number">Pregunta 5</div>
+                    <div class="question-text">¿Sentías que tenías que tener mucho cuidado con lo que decías o hacías para que no se enojara?</div>
+                    <div class="options">
+                        <div class="option">
+                            <input type="radio" name="q5" value="1" id="q5-1">
+                            <label for="q5-1">Nunca o casi nunca</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q5" value="2" id="q5-2">
+                            <label for="q5-2">Pocas veces</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q5" value="3" id="q5-3">
+                            <label for="q5-3">A veces</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q5" value="4" id="q5-4">
+                            <label for="q5-4">Muchas veces</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q5" value="5" id="q5-5">
+                            <label for="q5-5">Casi siempre / siempre</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pregunta 6 -->
+                <div class="question-block">
+                    <div class="question-number">Pregunta 6</div>
+                    <div class="question-text">¿Te daba la sensación de que a tu pareja no le importaban realmente tus sentimientos o problemas?</div>
+                    <div class="options">
+                        <div class="option">
+                            <input type="radio" name="q6" value="1" id="q6-1">
+                            <label for="q6-1">No, sí le importaban</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q6" value="2" id="q6-2">
+                            <label for="q6-2">Le importaban un poco menos de lo que esperabas</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q6" value="3" id="q6-3">
+                            <label for="q6-3">Casi no le importaban</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q6" value="4" id="q6-4">
+                            <label for="q6-4">Muy poco le importaban</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q6" value="5" id="q6-5">
+                            <label for="q6-5">Nada le importaban</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pregunta 7 -->
+                <div class="question-block">
+                    <div class="question-number">Pregunta 7</div>
+                    <div class="question-text">¿Quería controlar cosas de tu vida (cómo te vestías, con quién hablabas, tus redes, dinero o tiempo)?</div>
+                    <div class="options">
+                        <div class="option">
+                            <input type="radio" name="q7" value="1" id="q7-1">
+                            <label for="q7-1">No, respetaba mi espacio</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q7" value="2" id="q7-2">
+                            <label for="q7-2">Un poco controlador/a</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q7" value="3" id="q7-3">
+                            <label for="q7-3">Bastante controlador/a</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q7" value="4" id="q7-4">
+                            <label for="q7-4">Muy controlador/a</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q7" value="5" id="q7-5">
+                            <label for="q7-5">Control total casi en todo</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pregunta 8 -->
+                <div class="question-block">
+                    <div class="question-number">Pregunta 8</div>
+                    <div class="question-text">¿Te fue alejando de amigas/os, familia u otras personas importantes para ti?</div>
+                    <div class="options">
+                        <div class="option">
+                            <input type="radio" name="q8" value="1" id="q8-1">
+                            <label for="q8-1">No, apoyaba mis relaciones</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q8" value="2" id="q8-2">
+                            <label for="q8-2">Un poco</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q8" value="3" id="q8-3">
+                            <label for="q8-3">Bastante</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q8" value="4" id="q8-4">
+                            <label for="q8-4">Mucho</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q8" value="5" id="q8-5">
+                            <label for="q8-5">Demasiado, casi me quedé sola/o</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pregunta 9 -->
+                <div class="question-block">
+                    <div class="question-number">Pregunta 9</div>
+                    <div class="question-text">¿Notabas ciclos donde a veces era encantador/a y luego frío/a, cruel o distante sin motivo claro?</div>
+                    <div class="options">
+                        <div class="option">
+                            <input type="radio" name="q9" value="1" id="q9-1">
+                            <label for="q9-1">No, era bastante estable</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q9" value="2" id="q9-2">
+                            <label for="q9-2">Un poco cambiante</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q9" value="3" id="q9-3">
+                            <label for="q9-3">Bastante cambiante</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q9" value="4" id="q9-4">
+                            <label for="q9-4">Muy cambiante</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q9" value="5" id="q9-5">
+                            <label for="q9-5">Extremadamente cambiante, de amor a desprecio</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pregunta 10 -->
+                <div class="question-block">
+                    <div class="question-number">Pregunta 10</div>
+                    <div class="question-text">Aunque eras infeliz, ¿se te hacía muy difícil terminar o alejarte de esa relación?</div>
+                    <div class="options">
+                        <div class="option">
+                            <input type="radio" name="q10" value="1" id="q10-1">
+                            <label for="q10-1">No, pude salir fácil</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q10" value="2" id="q10-2">
+                            <label for="q10-2">Un poco difícil</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q10" value="3" id="q10-3">
+                            <label for="q10-3">Bastante difícil</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q10" value="4" id="q10-4">
+                            <label for="q10-4">Muy difícil</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q10" value="5" id="q10-5">
+                            <label for="q10-5">Extremadamente difícil</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="submit-container">
+                    <button type="submit" class="submit-btn" id="submitBtn" disabled>
+                        Calcular Resultados
+                    </button>
+                </div>
+            </form>
+
+            <!-- Contenedor de resultados -->
+            <div class="result-container" id="resultContainer">
+                <h2>📊 Tus Resultados</h2>
+                <div class="score" id="scoreDisplay">0 / 50</div>
+                <div class="score-label">Puntuación Total</div>
+                
+                <div class="interpretation" id="interpretationContainer">
+                    <!-- El contenido se llenará dinámicamente -->
+                </div>
+
+                <button class="reset-btn" onclick="resetTest()">🔄 Hacer el test nuevamente</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Actualizar estilos de opciones seleccionadas
+        document.querySelectorAll('.option').forEach(option => {
+            option.addEventListener('click', function() {
+                const radio = this.querySelector('input[type="radio"]');
+                radio.checked = true;
+                
+                // Remover selección de otras opciones del mismo grupo
+                const name = radio.name;
+                document.querySelectorAll(`input[name="${name}"]`).forEach(r => {
+                    r.parentElement.classList.remove('selected');
+                });
+                
+                // Agregar clase selected a la opción actual
+                this.classList.add('selected');
+                
+                updateProgress();
+            });
+        });
+
+        // Actualizar progreso
+        function updateProgress() {
+            let answeredCount = 0;
+            for (let i = 1; i <= 10; i++) {
+                if (document.querySelector(`input[name="q${i}"]:checked`)) {
+                    answeredCount++;
+                }
+            }
+            
+            document.getElementById('answeredCount').textContent = answeredCount;
+            document.getElementById('progressBar').style.width = (answeredCount / 10 * 100) + '%';
+            
+            // Habilitar botón de submit si todas están respondidas
+            document.getElementById('submitBtn').disabled = answeredCount < 10;
+        }
+
+        // Manejar envío del formulario
+        document.getElementById('testForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            let totalScore = 0;
+            
+            // Calcular puntuación total
+            for (let i = 1; i <= 10; i++) {
+                const selected = document.querySelector(`input[name="q${i}"]:checked`);
+                if (selected) {
+                    totalScore += parseInt(selected.value);
+                }
+            }
+            
+            // Mostrar resultados
+            displayResults(totalScore);
+            
+            // Scroll suave a resultados
+            document.getElementById('resultContainer').scrollIntoView({ 
+                behavior: 'smooth',
+                block: 'start'
+            });
+        });
+
+        // Mostrar resultados con interpretación
+        function displayResults(score) {
+            document.getElementById('scoreDisplay').textContent = score + ' / 50';
+            
+            let interpretation = '';
+            let levelClass = '';
+            let levelText = '';
+            
+            if (score >= 10 && score <= 20) {
+                levelClass = 'level-low';
+                levelText = 'Riesgo Bajo';
+                interpretation = `
+                    <h3>Riesgo Bajo de Abuso Narcisista</h3>
+                    <span class="level-badge ${levelClass}">${levelText}</span>
+                    <p>Tus respuestas sugieren que la relación que describes no presenta patrones significativos típicos de abuso narcisista. Es posible que hayas experimentado algunos comportamientos problemáticos comunes en relaciones, pero no necesariamente indicativos de narcisismo patológico.</p>
+                    <p><strong>Recomendaciones:</strong></p>
+                    <p>• Sigue cultivando relaciones saludables basadas en respeto mutuo</p>
+                    <p>• Mantén límites claros en todas tus relaciones</p>
+                    <p>• Si sientes malestar emocional, considera hablar con un profesional</p>
+                `;
+            } else if (score >= 21 && score <= 35) {
+                levelClass = 'level-medium';
+                levelText = 'Riesgo Moderado';
+                interpretation = `
+                    <h3>Riesgo Moderado de Abuso Narcisista</h3>
+                    <span class="level-badge ${levelClass}">${levelText}</span>
+                    <p>Tus respuestas indican la presencia de varios comportamientos que pueden ser característicos de una relación con tendencias narcisistas. Es posible que hayas experimentado manipulación emocional, gaslighting ocasional, o patrones de control.</p>
+                    <p><strong>Señales identificadas:</strong></p>
+                    <p>• Posibles intentos de manipulación emocional</p>
+                    <p>• Patrones de comportamiento inconsistentes</p>
+                    <p>• Necesidad de validación constante por parte de tu pareja</p>
+                    <p><strong>Recomendaciones:</strong></p>
+                    <p>• Considera buscar apoyo psicológico profesional</p>
+                    <p>• Reflexiona sobre tus límites personales y cómo protegerlos</p>
+                    <p>• Habla con personas de confianza sobre tus experiencias</p>
+                    <p>• Evalúa si esta relación es saludable para ti</p>
+                `;
+            } else if (score >= 36 && score <= 50) {
+                levelClass = 'level-high';
+                levelText = 'Riesgo Alto';
+                interpretation = `
+                    <h3>Riesgo Alto de Abuso Narcisista</h3>
+                    <span class="level-badge ${levelClass}">${levelText}</span>
+                    <p>Tus respuestas sugieren que has experimentado o estás experimentando una relación con patrones significativos de abuso narcisista. Esto puede incluir manipulación sistemática, gaslighting, control excesivo, aislamiento social, y ciclos de idealización-devaluación.</p>
+                    <p><strong>Patrones identificados:</strong></p>
+                    <p>• Love bombing seguido de devaluación</p>
+                    <p>• Gaslighting y manipulación de la realidad</p>
+                    <p>• Control excesivo sobre tu vida y decisiones</p>
+                    <p>• Aislamiento de tu red de apoyo</p>
+                    <p>• Ciclos impredecibles de afecto y rechazo</p>
+                    <p>• Dificultad extrema para terminar la relación</p>
+                    <p><strong>Recomendaciones urgentes:</strong></p>
+                    <p>• <strong>Busca ayuda profesional especializada en abuso narcisista</strong></p>
+                    <p>• Contacta con personas de confianza y comparte tu situación</p>
+                    <p>• Considera crear un plan de seguridad si estás en la relación actualmente</p>
+                    <p>• Reconoce que el abuso narcisista es real y válido</p>
+                    <p>• Recuerda: no es tu culpa y mereces una relación sana</p>
+                    <p style="margin-top: 20px; padding: 15px; background: #fff3cd; border-left: 4px solid #ffc107; border-radius: 5px;">
+                        <strong>⚠️ Importante:</strong> Si sientes que estás en peligro inmediato, contacta servicios de emergencia o líneas de ayuda para víctimas de violencia doméstica en tu país.
+                    </p>
+                `;
+            }
+            
+            document.getElementById('interpretationContainer').innerHTML = interpretation;
+            document.getElementById('resultContainer').classList.add('show');
+        }
+
+        // Reiniciar test
+        function resetTest() {
+            // Limpiar todas las selecciones
+            document.querySelectorAll('input[type="radio"]').forEach(radio => {
+                radio.checked = false;
+            });
+            
+            document.querySelectorAll('.option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            // Ocultar resultados
+            document.getElementById('resultContainer').classList.remove('show');
+            
+            // Resetear progreso
+            updateProgress();
+            
+            // Scroll al inicio
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
